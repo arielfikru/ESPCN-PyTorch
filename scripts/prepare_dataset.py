@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare database scripts.")
     parser.add_argument("--images_dir", type=str, help="Path to input image directory.")
     parser.add_argument("--output_dir", type=str, help="Path to generator image directory.")
-    parser.add_argument("--image_size", type=int, help="Low-resolution image size from raw image.")
+    parser.add_argument("--gt_image_size", type=int, help="Low-resolution image size from raw image.")
     parser.add_argument("--step", type=int, help="Crop image similar to sliding window.")
     parser.add_argument("--num_workers", type=int, help="How many threads to open at the same time.")
     args = parser.parse_args()
