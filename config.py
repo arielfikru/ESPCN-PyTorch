@@ -21,8 +21,9 @@ from torch.backends import cudnn
 random.seed(0)
 torch.manual_seed(0)
 np.random.seed(0)
-# Use GPU for training by default
-device = torch.device("cuda")
+# Use GPU for training by default if CUDA is available, else fallback to CPU
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 # Turning on when the image size does not change during training can speed up training
 cudnn.benchmark = True
 # When evaluating the performance of the SR model, whether to verify only the Y channel image data
