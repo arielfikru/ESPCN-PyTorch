@@ -37,6 +37,9 @@ def main():
     best_psnr = 0.0
     best_ssim = 0.0
 
+    print(f"CUDA Available: {torch.cuda.is_available()}")
+    print(f"Selected Device: {config.device}")
+
     train_prefetcher, test_prefetcher = load_dataset()
     print("Load all datasets successfully.")
 
