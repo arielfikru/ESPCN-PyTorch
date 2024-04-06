@@ -54,7 +54,7 @@ if mode == "train":
     pretrained_model_weights_path = f"ESPCN_x3-T91-647e91f3.pth.tar"
 
     # Incremental training and migration training
-    resume_model_weights_path = f"ESPCN-PyTorch/epochs_4.tar"
+    resume_model_weights_path = f"epochs_4.tar"
 
     # Total num epochs
     epochs = 10
