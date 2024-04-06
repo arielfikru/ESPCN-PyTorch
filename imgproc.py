@@ -320,74 +320,27 @@ def expand_y(image: np.ndarray) -> np.ndarray:
     return y_image
 
 
-# OLD
-# def rgb_to_ycbcr(image: np.ndarray, only_use_y_channel: bool) -> np.ndarray:
-#     """Implementation of rgb2ycbcr function in Matlab under Python language
-# 
-#     Args:
-#         image (np.ndarray): Image input in RGB format.
-#         only_use_y_channel (bool): Extract Y channel separately
-# 
-#     Returns:
-#         image (np.ndarray): YCbCr image array data
-# 
-#     """
-#     if only_use_y_channel:
-#         image = np.dot(image, [65.481, 128.553, 24.966]) + 16.0
-#     else:
-#         image = np.matmul(image, [[65.481, -37.797, 112.0], [128.553, -74.203, -93.786], [24.966, 112.0, -18.214]]) + [
-#             16, 128, 128]
-# 
-#     image /= 255.
-#     image = image.astype(np.float32)
-# 
-#     return image
-
-# New
-def rgb_to_ycbcr_torch(tensor: Tensor, only_use_y_channel: bool) -> Tensor:
-    """Implementation of rgb2ycbcr function in Matlab under PyTorch
-
-    References from：`https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion`
+def rgb_to_ycbcr(image: np.ndarray, only_use_y_channel: bool) -> np.ndarray:
+    """Implementation of rgb2ycbcr function in Matlab under Python language
 
     Args:
-        tensor (Tensor): Image data in PyTorch format
-        only_use_y_channel (bool): Extract only Y channel
+        image (np.ndarray): Image input in RGB format.
+        only_use_y_channel (bool): Extract Y channel separately
 
     Returns:
-        tensor (Tensor): YCbCr image data in PyTorch format
+        image (np.ndarray): YCbCr image array data
 
     """
-    # Define the weight matrix for RGB to YCbCr conversion
-    weight = torch.tensor([
-        [0.299, 0.587, 0.114],
-        [-0.168736, -0.331264, 0.5],
-        [0.5, -0.418688, -0.081312]
-    ]).to(tensor.device)
-
-    # Add an extra dimension for batch processing
-    weight = weight[None, :, :]  # Shape: [1, 3, 3]
-
-    # Convert tensor shape from NCHW to NHWC for matrix multiplication
-    tensor_nhwc = tensor.permute(0, 2, 3, 1)  # Shape: [N, H, W, C]
-
-    # Perform matrix multiplication and add the bias
     if only_use_y_channel:
-        bias = torch.tensor([16.0]).to(tensor.device)
-        # Use only the first row of the weight matrix for Y channel
-        tensor_nhwc = torch.matmul(tensor_nhwc, weight[:, :1, :].transpose(1, 2)) + bias
+        image = np.dot(image, [65.481, 128.553, 24.966]) + 16.0
     else:
-        bias = torch.tensor([16.0, 128.0, 128.0]).to(tensor.device)
-        tensor_nhwc = torch.matmul(tensor_nhwc, weight.transpose(1, 2)) + bias
+        image = np.matmul(image, [[65.481, -37.797, 112.0], [128.553, -74.203, -93.786], [24.966, 112.0, -18.214]]) + [
+            16, 128, 128]
 
-    # Convert tensor shape back from NHWC to NCHW
-    tensor = tensor_nhwc.permute(0, 3, 1, 2)  # Shape: [N, C, H, W]
+    image /= 255.
+    image = image.astype(np.float32)
 
-    # Normalize the output tensor to range [0, 1]
-    tensor /= 255.0
-
-    return tensor
-
-
+    return image
 
 def bgr_to_ycbcr(image: np.ndarray, only_use_y_channel: bool) -> np.ndarray:
     """Implementation of bgr2ycbcr function in Matlab under Python language.
@@ -457,7 +410,34 @@ def ycbcr_to_bgr(image: np.ndarray) -> np.ndarray:
 
     return image
 
+# def rgb_to_ycbcr_torch(tensor: Tensor, only_use_y_channel: bool) -> Tensor:
+#     """Implementation of rgb2ycbcr function in Matlab under PyTorch
+# 
+#     References from：`https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion`
+# 
+#     Args:
+#         tensor (Tensor): Image data in PyTorch format
+#         only_use_y_channel (bool): Extract only Y channel
+# 
+#     Returns:
+#         tensor (Tensor): YCbCr image data in PyTorch format
+# 
+#     """
+#     if only_use_y_channel:
+#         weight = Tensor([[65.481], [128.553], [24.966]]).to(tensor)
+#         tensor = torch.matmul(tensor.permute(0, 2, 3, 1), weight).permute(0, 3, 1, 2) + 16.0
+#     else:
+#         weight = Tensor([[65.481, -37.797, 112.0],
+#                          [128.553, -74.203, -93.786],
+#                          [24.966, 112.0, -18.214]]).to(tensor)
+#         bias = Tensor([16, 128, 128]).view(1, 3, 1, 1).to(tensor)
+#         tensor = torch.matmul(tensor.permute(0, 2, 3, 1), weight).permute(0, 3, 1, 2) + bias
+# 
+#     tensor /= 255.
+# 
+#     return tensor
 
+# New
 def rgb_to_ycbcr_torch(tensor: Tensor, only_use_y_channel: bool) -> Tensor:
     """Implementation of rgb2ycbcr function in Matlab under PyTorch
 
@@ -471,17 +451,33 @@ def rgb_to_ycbcr_torch(tensor: Tensor, only_use_y_channel: bool) -> Tensor:
         tensor (Tensor): YCbCr image data in PyTorch format
 
     """
-    if only_use_y_channel:
-        weight = Tensor([[65.481], [128.553], [24.966]]).to(tensor)
-        tensor = torch.matmul(tensor.permute(0, 2, 3, 1), weight).permute(0, 3, 1, 2) + 16.0
-    else:
-        weight = Tensor([[65.481, -37.797, 112.0],
-                         [128.553, -74.203, -93.786],
-                         [24.966, 112.0, -18.214]]).to(tensor)
-        bias = Tensor([16, 128, 128]).view(1, 3, 1, 1).to(tensor)
-        tensor = torch.matmul(tensor.permute(0, 2, 3, 1), weight).permute(0, 3, 1, 2) + bias
+    # Define the weight matrix for RGB to YCbCr conversion
+    weight = torch.tensor([
+        [0.299, 0.587, 0.114],
+        [-0.168736, -0.331264, 0.5],
+        [0.5, -0.418688, -0.081312]
+    ]).to(tensor.device)
 
-    tensor /= 255.
+    # Add an extra dimension for batch processing
+    weight = weight[None, :, :]  # Shape: [1, 3, 3]
+
+    # Convert tensor shape from NCHW to NHWC for matrix multiplication
+    tensor_nhwc = tensor.permute(0, 2, 3, 1)  # Shape: [N, H, W, C]
+
+    # Perform matrix multiplication and add the bias
+    if only_use_y_channel:
+        bias = torch.tensor([16.0]).to(tensor.device)
+        # Use only the first row of the weight matrix for Y channel
+        tensor_nhwc = torch.matmul(tensor_nhwc, weight[:, :1, :].transpose(1, 2)) + bias
+    else:
+        bias = torch.tensor([16.0, 128.0, 128.0]).to(tensor.device)
+        tensor_nhwc = torch.matmul(tensor_nhwc, weight.transpose(1, 2)) + bias
+
+    # Convert tensor shape back from NHWC to NCHW
+    tensor = tensor_nhwc.permute(0, 3, 1, 2)  # Shape: [N, C, H, W]
+
+    # Normalize the output tensor to range [0, 1]
+    tensor /= 255.0
 
     return tensor
 
