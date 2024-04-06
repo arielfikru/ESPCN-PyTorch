@@ -26,7 +26,7 @@ device = torch.device("cuda")
 # Turning on when the image size does not change during training can speed up training
 cudnn.benchmark = True
 # When evaluating the performance of the SR model, whether to verify only the Y channel image data
-only_test_y_channel = False
+only_test_y_channel = True
 # Model architecture name
 model_arch_name = "espcn_x3"
 # Model arch config
@@ -57,7 +57,7 @@ if mode == "train":
     resume_model_weights_path = f"epochs_4.tar"
 
     # Total num epochs
-    epochs = 10
+    epochs = 12
 
     # loss function weights
     loss_weights = 1.0
@@ -66,7 +66,7 @@ if mode == "train":
     model_lr = 1e-2
     model_momentum = 0.9
     model_weight_decay = 1e-4
-    model_nesterov = True
+    model_nesterov = False
 
     # EMA parameter
     model_ema_decay = 0.999
