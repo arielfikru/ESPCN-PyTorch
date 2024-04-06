@@ -28,36 +28,36 @@ cudnn.benchmark = True
 # When evaluating the performance of the SR model, whether to verify only the Y channel image data
 only_test_y_channel = False
 # Model architecture name
-model_arch_name = "espcn_x4"
+model_arch_name = "espcn_x3"
 # Model arch config
 in_channels = 1
 out_channels = 1
 channels = 64
-upscale_factor = 4
+upscale_factor = 3
 # Current configuration parameter method
 mode = "train"
 # Experiment name, easy to save weights and log files
-exp_name = "ESPCN_x4-T91"
+exp_name = "HSR"
 
 if mode == "train":
     # Dataset address
-    train_gt_images_dir = f"./data/T91/ESPCN/train"
-
-    test_gt_images_dir = f"./data/Set5/GTmod12"
-    test_lr_images_dir = f"./data/Set5/LRbicx{upscale_factor}"
+    train_gt_images_dir = f"./data/HSR/ESPCN/train"
+    valid_gt_images_dir = f"./data/HSR/ESPCN/valid"
+    test_gt_images_dir = f"./data/test/HR"
+    test_lr_images_dir = f"./data/test/LR"
 
     gt_image_size = int(17 * upscale_factor)
-    batch_size = 16
+    batch_size = 64
     num_workers = 4
 
     # The address to load the pretrained model
-    pretrained_model_weights_path = f""
+    pretrained_model_weights_path = f"ESPCN_x3-T91-647e91f3.pth.tar"
 
     # Incremental training and migration training
-    resume_model_weights_path = f""
+    resume_model_weights_path = f"ESPCN-PyTorch/epochs_4.tar"
 
     # Total num epochs
-    epochs = 3000
+    epochs = 10
 
     # loss function weights
     loss_weights = 1.0
@@ -66,7 +66,7 @@ if mode == "train":
     model_lr = 1e-2
     model_momentum = 0.9
     model_weight_decay = 1e-4
-    model_nesterov = False
+    model_nesterov = True
 
     # EMA parameter
     model_ema_decay = 0.999
@@ -81,8 +81,7 @@ if mode == "train":
 
 if mode == "test":
     # Test data address
-    lr_dir = f"./data/Set5/LRbicx{upscale_factor}"
+    lr_dir = f"./data/test/LR"
     sr_dir = f"./results/test/{exp_name}"
-    gt_dir = "./data/Set5/GTmod12"
-
-    model_weights_path = "./results/pretrained_models/ESPCN_x4-T91-64bf5ee4.pth.tar"
+    gt_dir = f"./data/test/HR"
+    model_path = f"results/{exp_name}/g_last.pth.tar"
