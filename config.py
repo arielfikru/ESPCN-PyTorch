@@ -57,7 +57,7 @@ if mode == "train":
     resume_model_weights_path = f"epochs_4.tar"
 
     # Total num epochs
-    epochs = 12
+    epochs = 16
 
     # loss function weights
     loss_weights = 1.0
